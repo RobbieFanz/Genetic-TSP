@@ -1,5 +1,9 @@
+import java.util.Random;
+
 
 public class TSPGenetic {//needs larger dataset 
+	
+	private static Random rand = new Random();
 	
 	private static final int map[][] = new int [][] {{0,3,3,8,9},
 											  {3,0,2,6,5},
@@ -79,6 +83,16 @@ public class TSPGenetic {//needs larger dataset
 				}
 			}
 		}
+		
+
+		int swap1 = rand.nextInt(5);
+		int swap2 = rand.nextInt(5);
+		int mid = path[swap1];
+		path[swap1]=path[swap2];
+		path[swap2]=mid;
+		
+	
+		
 		return path;
 	}
 	
@@ -88,10 +102,10 @@ public class TSPGenetic {//needs larger dataset
 					{4,3,2,1,0},
 					{3,1,2,0,4},
 					{2,0,4,1,3},
-					{0,3,4,1,2},
+					{1,4,3,2,0},
 					{1,2,4,3,0}};
 		
-		for(int i =0; i<300;i++) {
+		for(int i =0; i<300000;i++) {
 			population = resPop(population);
 		}
 		
@@ -99,6 +113,8 @@ public class TSPGenetic {//needs larger dataset
 			for(int k = 0; k<population[0].length; k++) {
 				System.out.print(population[j][k]);
 			}
+			System.out.print(" "+fitVal(population[j]));
+			
 			System.out.println();
 		}
 		
