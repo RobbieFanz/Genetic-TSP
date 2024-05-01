@@ -5,11 +5,18 @@ public class TSPGenetic {//needs larger dataset
 	
 	private static Random rand = new Random();
 	
-	private static final int map[][] = new int [][] {{0,3,3,8,9},
-											  {3,0,2,6,5},
-											  {3,2,0,9,7},
-											  {8,6,9,0,2},
-											  {9,5,7,2,0}};
+	final static int sizeOfMap = 11;
+	private static final int map[][] = new int [][] {{0,3,3,8,9,10000,6,11,10000,10000,10000},
+											  {3,0,2,6,5,7,10000,10000,10000,10000,10000},
+											  {3,2,0,9,7,6,3,10000,5,10000,10000},
+											  {8,6,9,0,2,10000,10000,1,10000,10000,6},
+											  {9,5,7,2,0,6,10000,4,10000,8,2},
+											  {10000,7,6,10000,6,0,6,10000,3,3,8},
+											  {6,10000,3,10000,10000,6,0,10000,4,10000,10000},
+											  {11,10000,10000,1,4,10000,10000,0,10000,10000,8},
+											  {10000,10000,5,10000,10000,3,4,10000,0,7,10000},
+											  {10000,10000,10000,10000,8,3,10000,10000,7,0,6},
+											  {10000,10000,10000,6,2,8,10000,8,10000,6,0}};
 	
 	//static int population[][]= new int[6][5];
 	
@@ -18,19 +25,19 @@ public class TSPGenetic {//needs larger dataset
 		for(int i=0; i<gene.length-1; i++) {
 			distance += map[gene[i]][gene[i+1]];
 		}
-		distance += map[gene[4]][gene[0]];//loops back to start
+		distance += map[gene[gene.length-1]][gene[0]];//loops back to start
 		return distance;
 	}
 	
 	public static int[][] resPop(int[][] pop) {
-		int best[][]=new int [3][5];
+		int best[][]=new int [3][sizeOfMap];
 		int fitnesses[]=new int[pop.length];
 		
 		for(int i = 0; i<pop.length;i++) {
 			fitnesses[i] = fitVal(pop[i]);
 		}
 		for(int j=0;j<3;j++) {
-			int fitest = 999;
+			int fitest = 9999999;
 			int fitNum=10;
 			for(int k= 0; k<fitnesses.length;k++) {
 				if(fitest>fitnesses[k]) {
@@ -39,8 +46,16 @@ public class TSPGenetic {//needs larger dataset
 				}
 			}
 			best[j]=pop[fitNum];
-			fitnesses[fitNum]=999;
+			fitnesses[fitNum]=99999999;
 		}
+		
+//		if(best[1].equals(best[0])||best[1].equals(best[2])){
+//			best[1]=mutate(best[1]);
+//		}
+//		if(best[2].equals(best[0])||best[2].equals(best[1])){
+//			best[2]=mutate(best[2]);
+//		}
+		
 		pop[0]=best[0];
 		pop[1]=best[1];
 		pop[2]=best[2];
@@ -52,20 +67,21 @@ public class TSPGenetic {//needs larger dataset
 	}
 	
 	public static int[] crossOver(int[] path1, int[] path2) {
-		int path[] = new int[5];
+		int path[] = new int[sizeOfMap];
 		for(int i = 0; i<path.length; i++) {
-			if(i>1) {
+			if(i>(path.length/2)) {
 				path[i]=path2[i];
 			}else {
 				path[i]=path1[i];
 			}
 		}
-		path = mutate(path);
+		path = checkThenMutate(path);
 		return path;
 	}
 	
-	public static int[] mutate(int[] path){
-		int visited[] = new int[5];
+	public static int[] checkThenMutate(int[] path){
+		//check for repeats
+		int visited[] = new int[sizeOfMap];
 		for(int i = 0; i<path.length; i++) {
 			if(visited[path[i]]==0) {
 				visited[path[i]]=1;
@@ -84,28 +100,36 @@ public class TSPGenetic {//needs larger dataset
 			}
 		}
 		
-
-		int swap1 = rand.nextInt(5);
-		int swap2 = rand.nextInt(5);
-		int mid = path[swap1];
-		path[swap1]=path[swap2];
-		path[swap2]=mid;
 		
+		path = mutate(path);
+		
+		return path;
+	}
 	
+	public static int[] mutate(int[] path) {
+		//mutate 50% chance of a mutation 3 times
+		for(int i =0; i<3;i++) {
+			
+				int swap1 = rand.nextInt(sizeOfMap);
+				int swap2 = rand.nextInt(sizeOfMap);
+				int mid = path[swap1];
+				path[swap1]=path[swap2];
+				path[swap2]=mid;
+		}
 		
 		return path;
 	}
 	
 
 	public static void main(String[] args) {
-		int population[][] = {{0,1,2,3,4},
-					{4,3,2,1,0},
-					{3,1,2,0,4},
-					{2,0,4,1,3},
-					{1,4,3,2,0},
-					{1,2,4,3,0}};
+		int population[][] = {{0,1,2,3,4,10,9,8,7,6,5},
+					{4,3,10,2,9,1,8,7,0,6,5},
+					{3,1,2,0,4,7,10,9,5,8,6},
+					{6,2,8,5,9,4,1,3,7,10,0},
+					{1,4,3,2,0,9,8,7,6,5,10},
+					{1,2,4,3,0,6,8,5,9,10,7}};
 		
-		for(int i =0; i<300000;i++) {
+		for(int i =0; i<3000;i++) {
 			population = resPop(population);
 		}
 		
